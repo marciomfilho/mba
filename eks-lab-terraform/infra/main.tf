@@ -1,4 +1,6 @@
-provider "aws" { region = var.region }
+provider "aws" {
+  region = var.region
+}
 
 resource "aws_iam_role" "eks_role" {
   name = "eksLabRole"
@@ -8,7 +10,10 @@ resource "aws_iam_role" "eks_role" {
 data "aws_iam_policy_document" "eks_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
-    principals { type = "Service" identifiers = ["eks.amazonaws.com"] }
+    principals {
+      type        = "Service"
+      identifiers = ["eks.amazonaws.com"]
+    }
   }
 }
 
@@ -20,7 +25,9 @@ resource "aws_iam_role_policy_attachment" "eks_AmazonEKSClusterPolicy" {
 resource "aws_eks_cluster" "this" {
   name     = var.cluster_name
   role_arn = aws_iam_role.eks_role.arn
-  vpc_config { subnet_ids = var.subnet_ids }
+  vpc_config {
+    subnet_ids = var.subnet_ids
+  }
   enabled_cluster_log_types = [
     "api", "audit", "authenticator", "controllerManager", "scheduler"
   ]
@@ -30,12 +37,17 @@ resource "aws_iam_role" "node_group_role" {
   name = "eksLabNodeGroupRole"
   assume_role_policy = data.aws_iam_policy_document.nodegroup_assume_role.json
 }
+
 data "aws_iam_policy_document" "nodegroup_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
-    principals { type = "Service" identifiers = ["ec2.amazonaws.com"] }
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
   }
 }
+
 resource "aws_iam_role_policy_attachment" "nodegroup_AmazonEKSWorkerNodePolicy" {
   role       = aws_iam_role.node_group_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"

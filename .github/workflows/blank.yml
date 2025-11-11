@@ -41,5 +41,3 @@ jobs:
           kubectl rollout undo deployment/nginx --to-revision=1 -n nginx
           kubectl delete -f eks-lab-terraform/k8s/02-service-nginx.yaml
           kubectl delete -f eks-lab-terraform/k8s/01-deployment.yaml
-nx.yaml
-          kubectl delete -f k8s/01-deployment.yaml

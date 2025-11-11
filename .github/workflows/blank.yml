@@ -11,8 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v2
-      - run: terraform -chdir=infra init
-      - run: terraform -chdir=infra apply -auto-approve
+      - run: terraform -chdir=eks-lab-terraform/infra init
+      - run: terraform -chdir=eks-lab-terraform/infra apply -auto-approve
     
   deploy_nginx:
     needs: terraform
@@ -29,16 +29,17 @@ jobs:
         with:
           version: 'latest'
       - run: |
-          kubectl apply -f k8s/00-namespace.yaml
-          kubectl apply -f k8s/01-deployment.yaml
-          kubectl apply -f k8s/02-service-nginx.yaml
-      # Testes de escala, rollback e limpeza
+          kubectl apply -f eks-lab-terraform/k8s/00-namespace.yaml
+          kubectl apply -f eks-lab-terraform/k8s/01-deployment.yaml
+          kubectl apply -f eks-lab-terraform/k8s/02-service-nginx.yaml
       - run: |
           kubectl scale deployment nginx --replicas=8 -n nginx
           kubectl scale deployment nginx --replicas=2 -n nginx
-          kubectl apply -f k8s/03-deployment-v1.yaml
-          kubectl apply -f k8s/04-deployment-v2.yaml
+          kubectl apply -f eks-lab-terraform/k8s/03-deployment-v1.yaml
+          kubectl apply -f eks-lab-terraform/k8s/04-deployment-v2.yaml
           kubectl rollout history deployment nginx -n nginx
           kubectl rollout undo deployment/nginx --to-revision=1 -n nginx
-          kubectl delete -f k8s/02-service-nginx.yaml
+          kubectl delete -f eks-lab-terraform/k8s/02-service-nginx.yaml
+          kubectl delete -f eks-lab-terraform/k8s/01-deployment.yaml
+nx.yaml
           kubectl delete -f k8s/01-deployment.yaml

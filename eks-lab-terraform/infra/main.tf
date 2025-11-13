@@ -34,3 +34,17 @@ resource "aws_eks_node_group" "node_group" {
   instance_types = ["t3.medium"]
   disk_size      = 20
 }
+
+data "aws_eks_cluster" "this" {
+  name = aws_eks_cluster.this.name
+}
+
+data "aws_eks_cluster_auth" "this" {
+  name = aws_eks_cluster.this.name
+}
+
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.this.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.this.token
+}

@@ -1,17 +1,3 @@
-provider "kubernetes" {
-  host                   = aws_eks_cluster.this.endpoint
-  cluster_ca_certificate = base64decode(aws_eks_cluster.this.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.this.token
-}
-
-data "aws_eks_cluster" "this" {
-  name = aws_eks_cluster.this.name
-}
-
-data "aws_eks_cluster_auth" "this" {
-  name = aws_eks_cluster.this.name
-}
-
 resource "kubernetes_namespace" "nginx" {
   metadata {
     name = "nginx"
@@ -29,13 +15,6 @@ resource "kubernetes_deployment" "nginx" {
     selector {
       match_labels = { app = "nginx" }
     }
-    strategy {
-      type = "RollingUpdate"
-      rolling_update {
-        max_surge       = "100%"
-        max_unavailable = "25%"
-      }
-    }
     template {
       metadata { labels = { app = "nginx" } }
       spec {
@@ -47,21 +26,14 @@ resource "kubernetes_deployment" "nginx" {
             "-c",
             "echo '<h1>This is the new Kubernetes default page!</h1>' > /usr/share/nginx/html/index.html && exec nginx -g 'daemon off;'"
           ]
-          ports {
+          port {
             container_port = 80
           }
           resources {
-            limits {
-              cpu    = "100m"
-              memory = "256Mi"
-            }
-            requests {
-              cpu    = "50m"
-              memory = "128Mi"
-            }
+            limits   = { cpu = "100m", memory = "256Mi" }
+            requests = { cpu = "50m", memory = "128Mi" }
           }
         }
-        restart_policy = "Always"
       }
     }
   }
@@ -73,9 +45,7 @@ resource "kubernetes_service" "nginx" {
     namespace = kubernetes_namespace.nginx.metadata[0].name
   }
   spec {
-    selector = {
-      app = "nginx"
-    }
+    selector = { app = "nginx" }
     port {
       port        = 80
       target_port = 80

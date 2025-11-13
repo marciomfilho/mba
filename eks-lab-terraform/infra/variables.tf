@@ -1,8 +1,8 @@
-variable "region"         { default = "us-east-1" }
-variable "cluster_name"   { default = "eks-lab" }
+variable "lab_role_arn" { default = "arn:aws:iam::169402690764:role/LabRole" }
+variable "region" { default = "us-east-1" }
+variable "cluster_name" { default = "eks-lab" }
 variable "node_group_name" { default = "eks-lab-node-group" }
 variable "desired_capacity" { default = 2 }
-variable "vpc_id"         { default = "vpc-0bcf663562bd6dc85" }
 variable "subnet_ids" {
   type = list(string)
   default = [
@@ -11,3 +11,4 @@ variable "subnet_ids" {
     "subnet-083a433a12912667e"
   ]
 }
+

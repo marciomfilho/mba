@@ -34,11 +34,7 @@ jobs:
       - run: aws eks update-kubeconfig --region us-east-1 --name eks-lab
       - uses: azure/setup-kubectl@v3
         with:
-          version: 'latest'
-      - run: |
-          kubectl apply -f eks-lab-terraform/k8s/00-namespace.yaml
-          kubectl apply -f eks-lab-terraform/k8s/01-deployment.yaml
-          kubectl apply -f eks-lab-terraform/k8s/02-service-nginx.yaml
+          version: 'latest'      
       - run: |
           kubectl scale deployment nginx --replicas=8 -n nginx
           kubectl scale deployment nginx --replicas=2 -n nginx
